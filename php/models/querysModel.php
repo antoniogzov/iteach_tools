@@ -12,7 +12,7 @@ class Queries extends data_conn
         $results = array();
 
         try {
-
+            echo $stmt;
             $query = $this->conn->query($stmt);
 
             while ($row = $query->fetch(PDO::FETCH_OBJ)) {
