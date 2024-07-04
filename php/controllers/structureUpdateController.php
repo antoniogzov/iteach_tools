@@ -150,12 +150,12 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
 
     //--- PROCESO PARA VERIFICAR SI TODOS TIENEN LA ESTRUCTURA PARA ALMACENAR LOS PROMEDIOS POR PERIODOS ---//
     $stmt = " SELECT gp.id_grade_period, evp.id_evaluation_plan, fg.id_final_grade, fg.id_student
-FROM iteach_grades_quantitatives.final_grades_assignment AS fg 
-INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON fg.id_assignment = evp.id_assignment 
-INNER JOIN iteach_grades_quantitatives.grades_period AS gp ON gp.id_final_grade = fg.id_final_grade AND gp.id_period_calendar = evp.id_period_calendar
-LEFT JOIN iteach_grades_quantitatives.grades_evaluation_criteria AS gec ON evp.id_evaluation_plan = gec.id_evaluation_plan AND gec.id_final_grade = fg.id_final_grade
-WHERE evp.id_period_calendar = $id_period AND fg.id_assignment = $id_assignment  AND gec.id_final_grade IS NULL
-ORDER BY fg.id_final_grade, evp.id_evaluation_plan";
+        FROM iteach_grades_quantitatives.final_grades_assignment AS fg 
+        INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON fg.id_assignment = evp.id_assignment 
+        INNER JOIN iteach_grades_quantitatives.grades_period AS gp ON gp.id_final_grade = fg.id_final_grade AND gp.id_period_calendar = evp.id_period_calendar
+        LEFT JOIN iteach_grades_quantitatives.grades_evaluation_criteria AS gec ON evp.id_evaluation_plan = gec.id_evaluation_plan AND gec.id_final_grade = fg.id_final_grade
+        WHERE evp.id_period_calendar = $id_period AND fg.id_assignment = $id_assignment  AND gec.id_final_grade IS NULL
+        ORDER BY fg.id_final_grade, evp.id_evaluation_plan";
     $catalog_item = $queries->getData($stmt);
 
 
