@@ -1,5 +1,4 @@
 <?php
-include_once 'Connection.php';
 class Queries extends data_conn
 {
     private $conn;
@@ -16,7 +15,7 @@ class Queries extends data_conn
 
             $query = $this->conn->query($stmt);
 
-            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            while ($row = $query->fetch(PDO::FETCH_OBJ)) {
                 $results[] = $row;
             }
         } catch (Exception $e) {
