@@ -30,8 +30,7 @@ class evalStructure extends data_conn
         INNER JOIN school_control_ykt.academic_levels AS acl ON acl.id_academic_level = lvc.id_academic_level
         INNER JOIN school_control_ykt.academic_levels_grade AS aclg ON aclg.id_academic_level = acl.id_academic_level
         INNER JOIN school_control_ykt.groups AS gps ON gps.id_level_grade = aclg.id_level_grade  AND lvc.id_campus = gps.id_campus AND gps.id_section = lvc.id_section
-        INNER JOIN school_control_ykt.assignments AS asg
-            ON asg.id_group = gps.id_group AND (show_list_teacher = 0 OR show_list_teacher = percal.no_period)
+        INNER JOIN school_control_ykt.assignments AS asg ON asg.id_group = gps.id_group AND (show_list_teacher = 0 OR show_list_teacher = percal.no_period)
         INNER JOIN school_control_ykt.subjects AS sbj ON sbj.id_subject = asg.id_subject AND sbj.id_academic_area = lvc.id_academic_area
         INNER JOIN colaboradores_ykt.colaboradores AS colab ON colab.no_colaborador = asg.no_teacher
         WHERE lvc.id_level_combination = $id_level_combination AND percal.id_period_calendar = $id_period_calendar

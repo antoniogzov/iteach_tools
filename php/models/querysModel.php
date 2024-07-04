@@ -16,7 +16,7 @@ class Queries extends data_conn
 
             $query = $this->conn->query($stmt);
 
-            while ($row = $query->fetch(PDO::FETCH_OBJ)) {
+            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
                 $results[] = $row;
             }
         } catch (Exception $e) {
