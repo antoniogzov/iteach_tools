@@ -12,14 +12,14 @@ class Queries extends data_conn
         $results = array();
 
         try {
-            echo $stmt;
+            /* echo $stmt; */
             $query = $this->conn->query($stmt);
 
             while ($row = $query->fetch(PDO::FETCH_OBJ)) {
                 $results[] = $row;
             }
         } catch (Exception $e) {
-            echo 'Exception -> ' . $query;
+            var_dump($query);
             var_dump($e->getMessage());
         }
 
