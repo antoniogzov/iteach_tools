@@ -1,4 +1,5 @@
 <?php
+include '../models/Connection.php';
 include '../models/querysModel.php';
 
 session_start();
