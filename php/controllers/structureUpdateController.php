@@ -145,7 +145,7 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
             $id_final_grade = $grape->id_final_grade;
 
             $stmtGRAPE = ("INSERT INTO iteach_grades_quantitatives.grades_period (id_final_grade, id_period_calendar, no_period) VALUES ($id_final_grade, $id_period, $no_period)");
-            $queries->getData($stmtGRAPE);
+            $queries->InsertData($stmtGRAPE);
         }
     }
 
