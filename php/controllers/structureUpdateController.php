@@ -123,7 +123,7 @@ WHERE adt_std_assg.id_assignment = $id_assignment AND student.status = 1 AND fg.
         $student_code = $fga_ex->student_code;
 
         $stmtFGAEx = ("INSERT INTO iteach_grades_quantitatives.final_grades_assignment (id_inscription, additional_registration_id, id_assignment, id_student, student_code) VALUES ($id_inscription, $additional_registration_id, $id_assignment, $id_student, '$student_code')");
-        $queries->getData($stmtFGAEx);
+        $queries->InsertData($stmtFGAEx);
     }
 
     //--- PROCESO PARA VERIFICAR SI TODOS TIENEN LA ESTRUCTURA PARA ALMACENAR LOS PROMEDIOS POR PERIODOS ---//
@@ -170,7 +170,7 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
             $id_student = $row->id_student;
 
             $stmt = ("INSERT INTO iteach_grades_quantitatives.grades_evaluation_criteria (id_grade_period, id_evaluation_plan, id_final_grade) VALUES ($id_grade_period, $id_evaluation_plan, $id_final_grade)");
-            $queries->getData($stmt);
+            $queries->InsertData($stmt);
 
             $smtCOGTH = ("SELECT conf_gat.*
         FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
@@ -206,7 +206,7 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
                         $id_grades_evaluation_criteria = $grath->id_grades_evaluation_criteria;
 
                         $stmtGraGth = ("INSERT INTO iteach_grades_quantitatives.grade_gathering (id_conf_grade_gathering, id_evaluation_plan, id_grades_evaluation_criteria, id_final_grade) VALUES ('$id_conf_grade_gathering', '$id_evaluation_plan', '$id_grades_evaluation_criteria', '$id_final_grade')");
-                        $queries->getData($stmtGraGth);
+                        $queries->InsertData($stmtGraGth);
                     }
                 }
             }
@@ -268,7 +268,7 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
                         $id_grades_evaluation_criteria = $grath->id_grades_evaluation_criteria;
 
                         $stmtGraGth = ("INSERT INTO iteach_grades_quantitatives.grade_gathering (id_conf_grade_gathering, id_evaluation_plan, id_grades_evaluation_criteria, id_final_grade) VALUES ('$id_conf_grade_gathering', '$id_evaluation_plan', '$id_grades_evaluation_criteria', '$id_final_grade')");
-                        $queries->getData($stmtGraGth);
+                        $queries->InsertData($stmtGraGth);
                     }
                 }
             }
@@ -294,7 +294,7 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
              '',
              NOW()
              )");
-        $queries->getData($stmtGraGth);
+        $queries->InsertData($stmtGraGth);
         $data = array(
             'response' => false,
             'message' => 'Se actualizó la hoja de trabajo'
