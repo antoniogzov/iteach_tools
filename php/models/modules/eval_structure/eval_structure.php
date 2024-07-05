@@ -103,6 +103,20 @@ class evalStructure extends data_conn
                 if ($fga_structure > 0 || $add_assignment > 0 || $fga_ass > 0 || $ev_criteria > 0) {
 
                     $results[] = $row_assignment;
+
+                    $ev_pending = $this->conn->query("SELECT COUNT(id_iteach_pendings)
+                    FROM automation_pending.iteach_pendings
+                    WHERE id_period_calendar = $row_assignment->id_period_calendar AND id_assignment = $row_assignment->id_assignment  AND active = 1")->fetchColumn();
+
+                    if ($ev_pending == 0) {
+                        $this->conn->query("INSERT INTO automation_pending.iteach_pendings (id_assignment, id_period_calendar, id_pending_types, active) VALUES(
+                                $row_assignment->id_assignment,
+                                $row_assignment->id_period_calendar,
+                                1,
+                                1
+                            )
+                            ");
+                    }
                 }
             }
         }

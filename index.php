@@ -1,10 +1,13 @@
 
    <?php
 
-   
-include 'php/models/modules/eval_structure/eval_structure.php';
 
-$structure_model  = new evalStructure;
+    include 'php/models/modules/eval_structure/eval_structure.php';
+    include 'php/models/modules/automatic_eval_structure/automatic_eval_structure.php';
+
+
+    $structure_model  = new evalStructure;
+    $automatic_structure_model  = new evalStructureAutomatic;
 
     include 'php/views/head.php';
     include 'php/views/navbar.php';
@@ -18,6 +21,11 @@ $structure_model  = new evalStructure;
             case 'eval_structure':
                 $include_file = 'php/views/modules/eval_structure/eval_structure.php';
                 break;
+            case 'automatic_eval_structure':
+                $include_file = 'php/views/modules/automatic_structure/automatic_eval_structure.php';
+
+                break;
+
 
             default:
 
