@@ -47,7 +47,8 @@ class evalStructureAutomatic extends data_conn
 
         $fga_structure = 0;
         $html = '';
-
+        $html_brgin = "<br><h1>ATENCIÓN: Se ha comenzado el proceso de actualización automática de las hojas de trabajo.</h1>";
+        $this->sendMailBeginProccess($html_brgin);
         while ($row_assignment = $get_results->fetch(PDO::FETCH_OBJ)) {
 
             $getEvalPlan = $this->conn->query("SELECT COUNT(id_evaluation_plan)
@@ -97,6 +98,7 @@ class evalStructureAutomatic extends data_conn
         $html1 .="<br>".$html;
 
         $this->sendMailStructure($html1, $time_txt);
+        
         return $results;
     }
 
@@ -442,6 +444,48 @@ class evalStructureAutomatic extends data_conn
 
             $mail->isHTML(true);                                  //Set email format to HTML
             $mail->Subject = utf8_decode('Actualización iTeach Tools'.$time_txt);
+            $mail->Body    = $html;
+
+            //Attachments
+            //$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+            //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+            //Content
+
+            $mail->send();
+        } catch (Exception $e) {
+        }
+    }
+
+    public function sendMailBeginProccess($html)
+    {
+
+        $mail = new PHPMailer(true);
+
+        try {
+            //Server settings
+            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+            $mail->isSMTP();                                            //Send using SMTP
+            $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+            $mail->Username   = 'notificacionykt@ae.edu.mx';                     //SMTP username
+            $mail->Password   = 'Ykt2020a';                               //SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->Port       = 465;
+
+            $mail->SMTPDebug = false;
+
+            //Recipients
+            $mail->setFrom('no-contestar@ae.edu.mx', utf8_decode('iTEACH TOOLS'));                               //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+            //Recipients
+            $mail->addAddress('antoniogonzalez.rt@gmail.com');
+            //$mail->addAddress('i.sistemas@ae.edu.mx');
+            //$mail->addAddress('antoniogonzalez.rt@gmail.com');
+            //$mail->addAddress('i.sistemas@ae.edu.mx');
+
+            $mail->isHTML(true);                                  //Set email format to HTML
+            $mail->Subject = utf8_decode('Inicio de proceso');
             $mail->Body    = $html;
 
             //Attachments
