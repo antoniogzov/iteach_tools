@@ -6,6 +6,18 @@ $cn = new data_conn();
 $conexion = $cn->dbConn();
 date_default_timezone_set('America/Mexico_City');
 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+//Load Composer's autoloader
+require dirname(__DIR__ . '', 4) . '/assets/vendor/autoload.php';
+
+
+
+
+
 class evalStructureAutomatic extends data_conn
 {
     private $conn;
@@ -19,6 +31,12 @@ class evalStructureAutomatic extends data_conn
         $results = array();
 
         $today = date('Y-m-d');
+        // Disparar cronometro  
+        $start_time = microtime(true);
+        //El codigo a medir aqui , o funcion o invocacion  
+        //a clase. Por ejemplo: 
+        $a = 1;
+
 
 
 
@@ -28,6 +46,7 @@ class evalStructureAutomatic extends data_conn
 
 
         $fga_structure = 0;
+        $html = '';
 
         while ($row_assignment = $get_results->fetch(PDO::FETCH_OBJ)) {
 
@@ -37,7 +56,7 @@ class evalStructureAutomatic extends data_conn
                 ")->fetchColumn();
 
             if ($getEvalPlan > 0) {
-                $this->createStructureQualificationsByPeriod1($row_assignment->id_assignment, $row_assignment->id_period_calendar);
+
 
                 $get_results_data = $this->conn->query("SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree, percal.id_period_calendar,
                 UPPER(CONCAT(colab.apellido_paterno_colaborador, ' ', colab.apellido_materno_colaborador, ' ', colab.nombres_colaborador)) AS teacher_name
@@ -57,12 +76,27 @@ class evalStructureAutomatic extends data_conn
 
                 while ($row_assignment_data = $get_results_data->fetch(PDO::FETCH_OBJ)) {
                     $results[] = $row_assignment_data;
+                    echo "";
+                    echo "<br><h1>ASIGNATURA: $row_assignment_data->name_subject | $row_assignment_data->group_code | $row_assignment->id_assignment</h1>";
+                    $html .= "<br><h1>ASIGNATURA: $row_assignment_data->name_subject | $row_assignment_data->group_code | $row_assignment->id_assignment</h1>";
                 }
+                $this->createStructureQualificationsByPeriod1($row_assignment->id_assignment, $row_assignment->id_period_calendar);
                 $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
                 WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1");
+
+                $a++;
             }
         }
+        // Calcular tiempo demorado  
+        $end_time = (microtime(true) - $start_time);
+        $time = $this->segundos_tiempo($end_time);
+        echo 'Segundos: ' . $end_time . ' Resultado: ' . $time;
+        $time_txt= " | Tiempo de ejecución = " . $time . "";
+        echo " <h1><strong>Tiempo de ejecucion = " . $time . " </strong></h1>";
+        $html1 = "<br><br> <h1><strong>Tiempo de ejecución = " . $time . " </strong></h1>";
+        $html1 .="<br>".$html;
 
+        $this->sendMailStructure($html1, $time_txt);
         return $results;
     }
 
@@ -352,5 +386,72 @@ class evalStructureAutomatic extends data_conn
         }
 
         //  echo json_encode($data);
+    }
+
+    function segundos_tiempo($segundos)
+    {
+        $minutos = $segundos / 60;
+        $horas = floor($minutos / 60);
+        $minutos2 = $minutos % 60;
+        $segundos_2 = $segundos % 60 % 60 % 60;
+        if ($minutos2 < 10)
+            $minutos2 = '0' . $minutos2;
+
+        if ($segundos_2 < 10)
+            $segundos_2 = '0' . $segundos_2;
+
+        if ($segundos < 60) { /* segundos */
+            $resultado = round($segundos) . ' Segundos';
+        } elseif ($segundos > 60 && $segundos < 3600) { /* minutos */
+            $resultado = $minutos2
+                . ':'
+                . $segundos_2
+                . ' Minutos';
+        } else { /* horas */
+            $resultado = $horas . ':' . $minutos2 . ':' . $segundos_2 . ' Horas';
+        }
+        return $resultado;
+    }
+
+    public function sendMailStructure($html, $time_txt)
+    {
+
+        $mail = new PHPMailer(true);
+
+        try {
+            //Server settings
+            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+            $mail->isSMTP();                                            //Send using SMTP
+            $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+            $mail->Username   = 'notificacionykt@ae.edu.mx';                     //SMTP username
+            $mail->Password   = 'Ykt2020a';                               //SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->Port       = 465;
+
+            $mail->SMTPDebug = false;
+
+            //Recipients
+            $mail->setFrom('no-contestar@ae.edu.mx', utf8_decode('iTEACH TOOLS'));                               //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+            //Recipients
+            $mail->addAddress('antoniogonzalez.rt@gmail.com');
+            //$mail->addAddress('i.sistemas@ae.edu.mx');
+            //$mail->addAddress('antoniogonzalez.rt@gmail.com');
+            //$mail->addAddress('i.sistemas@ae.edu.mx');
+
+            $mail->isHTML(true);                                  //Set email format to HTML
+            $mail->Subject = utf8_decode('Actualización iTeach Tools'.$time_txt);
+            $mail->Body    = $html;
+
+            //Attachments
+            //$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+            //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+            //Content
+
+            $mail->send();
+        } catch (Exception $e) {
+        }
     }
 }
