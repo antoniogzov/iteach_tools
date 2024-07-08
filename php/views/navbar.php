@@ -13,6 +13,7 @@
                     <ul>
                         <li><a href="?submodule=eval_structure">Estructura de evaluaciones</a></li>
                         <li><a href="?submodule=automatic_eval_structure">Estructura de evaluaciones (AUTOMÁTICO)</a></li>
+                        <li><a href="?submodule=pendings_evaluation">Pendientes de actualización</a></li>
                         <!-- <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
                                 <li><a href="#">Deep Dropdown 1</a></li>

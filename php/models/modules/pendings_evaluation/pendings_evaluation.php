@@ -123,33 +123,6 @@ class evalStructure extends data_conn
 
         return $results;
     }
-    public function getAssignmentsPendings()
-    {
-        $results = array();
-
-        $today = date('Y-m-d');
-
-
-
-        $get_results = $this->conn->query("SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree, percal.no_period
-        FROM
-        automation_pending.iteach_pendings AS pend
-        INNER JOIN school_control_ykt.assignments AS asg ON pend.id_assignment = asg.id_assignment
-        INNER JOIN school_control_ykt.groups AS gps ON  asg.id_group = gps.id_group
-        INNER JOIN school_control_ykt.academic_levels_grade AS aclg ON gps.id_level_grade = aclg.id_level_grade
-        INNER JOIN school_control_ykt.subjects AS sbj ON sbj.id_subject = asg.id_subject
-        INNER JOIN iteach_grades_quantitatives.period_calendar AS percal ON percal.id_period_calendar = pend.id_period_calendar
-        WHERE pend.active = 1
-        ORDER BY asg.id_assignment
-        ");
-
-
-        while ($row_assignment = $get_results->fetch(PDO::FETCH_OBJ)) {
-            $results[] = $row_assignment;
-        }
-
-        return $results;
-    }
     public function getLevelCombinations()
     {
         $results = array();

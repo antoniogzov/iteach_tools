@@ -26,6 +26,12 @@
 
                 break;
 
+            case 'pendings_evaluation':
+                $include_file = 'php/views/modules/pendings_evaluation/pendings_evaluation.php';
+                break;
+
+
+
 
             default:
 
