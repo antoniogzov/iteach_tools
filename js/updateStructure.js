@@ -106,6 +106,33 @@ $(document).ready(function () {
       }
     });
   });
+  $(document).on("keypress", "#searchAssignment", function (event) {
+    var id_period_calendar = $("#slct-period").val();
+    //--- --- ---//
+    var keycode = event.keyCode || event.which;
+    if (keycode == 13) {
+      /* alert("Enter!"); */
+      event.preventDefault();
+      loading();
+      var search_value = $(this).val().trim();
+      $.ajax({
+        url: "php/controllers/structureUpdateController.php",
+        method: "POST",
+        data: {
+          mod: "getAssignment",
+          search_value: search_value,
+          id_period_calendar: id_period_calendar,
+        },
+      })
+        .done(function (info) {
+          info = $.parseJSON(info);
+          Swal.close();
+          $("#tableAssignments > tbody").html(info.html);
+          Swal.close();
+        })
+        .fail(function (message) {});
+    }
+  });
 });
 
 function loading() {

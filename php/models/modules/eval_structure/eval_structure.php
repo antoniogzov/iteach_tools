@@ -123,6 +123,41 @@ class evalStructure extends data_conn
 
         return $results;
     }
+    public function getAllAssignments($id_level_combination, $id_period_calendar)
+    {
+        $results = array();
+
+        $today = date('Y-m-d');
+
+
+
+        $get_results = $this->conn->query("SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree, percal.id_period_calendar,
+        UPPER(CONCAT(colab.apellido_paterno_colaborador, ' ', colab.apellido_materno_colaborador, ' ', colab.nombres_colaborador)) AS teacher_name
+        FROM
+        iteach_grades_quantitatives.period_calendar AS percal
+        INNER JOIN school_control_ykt.level_combinations AS lvc ON lvc.id_level_combination = percal.id_level_combination
+        INNER JOIN school_control_ykt.academic_levels AS acl ON acl.id_academic_level = lvc.id_academic_level
+        INNER JOIN school_control_ykt.academic_levels_grade AS aclg ON aclg.id_academic_level = acl.id_academic_level
+        INNER JOIN school_control_ykt.groups AS gps ON gps.id_level_grade = aclg.id_level_grade  AND lvc.id_campus = gps.id_campus AND gps.id_section = lvc.id_section
+        INNER JOIN school_control_ykt.assignments AS asg ON asg.id_group = gps.id_group AND (show_list_teacher = 0 OR show_list_teacher = percal.no_period)
+        INNER JOIN school_control_ykt.subjects AS sbj ON sbj.id_subject = asg.id_subject AND sbj.id_academic_area = lvc.id_academic_area
+        INNER JOIN colaboradores_ykt.colaboradores AS colab ON colab.no_colaborador = asg.no_teacher
+        WHERE lvc.id_level_combination = $id_level_combination AND percal.id_period_calendar = $id_period_calendar
+        ORDER BY asg.id_assignment
+        ");
+
+
+
+
+        $fga_structure = 0;
+
+        while ($row_assignment = $get_results->fetch(PDO::FETCH_OBJ)) {
+
+            $results[] = $row_assignment;
+        }
+
+        return $results;
+    }
     public function getAssignmentsPendings()
     {
         $results = array();

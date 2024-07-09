@@ -14,6 +14,7 @@
                         <li><a href="?submodule=eval_structure">Estructura de evaluaciones</a></li>
                         <li><a href="?submodule=automatic_eval_structure">Estructura de evaluaciones (AUTOMÁTICO)</a></li>
                         <li><a href="?submodule=pendings_evaluation">Pendientes de actualización</a></li>
+                        <li><a href="?submodule=all_assignments">Asignaturas por sección</a></li>
                         <!-- <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
                                 <li><a href="#">Deep Dropdown 1</a></li>
@@ -28,7 +29,7 @@
                         <li><a href="#">Dropdown 4</a></li> -->
                     </ul>
                 </li>
-                <li><a href="index.html#about">Gestor de periodos</a></li>
+                <li><a href="http://servykt.homeip.net:8083/wykt/interno/consultas_temporales/updatePeriodCalendarYKT/">Gestor de periodos</a></li>
                 <!-- <li><a href="index.html#features">Features</a></li>
                 <li><a href="index.html#services">Services</a></li>
                 <li><a href="index.html#pricing">Periodos</a></li> -->

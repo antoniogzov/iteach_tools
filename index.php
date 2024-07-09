@@ -29,9 +29,9 @@
             case 'pendings_evaluation':
                 $include_file = 'php/views/modules/pendings_evaluation/pendings_evaluation.php';
                 break;
-
-
-
+            case 'all_assignments':
+                $include_file = 'php/views/modules/all_assignments/all_assignments.php';
+                break;
 
             default:
 

@@ -71,11 +71,10 @@ function createStructureQualificationsMassive()
 
     foreach ($getPeriods as $periods) {
         $id_period = $periods->id_period_calendar;
-        
     }
     createStructureQualificationsByPeriod($id_assignment, $id_period_calendar);
 
-   
+
     $data = array(
         'response' => true,
         'message' => 'Se actualizó la hoja de trabajo'
@@ -302,4 +301,71 @@ WHERE fg.id_assignment = $id_assignment AND student.status = 1 AND gp.id_final_g
     }
 
     //  echo json_encode($data);
+}
+
+function getAssignment()
+{
+
+    $search_value = $_POST['search_value'];
+    $id_period_calendar = $_POST['id_period_calendar'];
+    $colsSearch = [
+        'asg.id_assignment',
+        'sbj.name_subject',
+        'gps.group_code',
+        'aclg.degree',
+        "CONCAT(colab.apellido_paterno_colaborador, ' ', colab.apellido_materno_colaborador, ' ', colab.nombres_colaborador)"
+    ];
+
+    $where = "";
+    if (isset($_POST['search_value']) && ($_POST['search_value'] != '')) {
+        $search_value = $_POST['search_value'];
+        $where .= " WHERE (";
+        for ($i = 0; $i < count($colsSearch); $i++) {
+            $where .= $colsSearch[$i] . " LIKE '%" . addslashes($search_value) . "%' OR ";
+        }
+        $where = substr($where, 0, -3);
+        $where .= ") AND asg.assignment_active = 1 AND gps.is_active = 1 AND asg.print_school_report_card = 1 ";
+    }
+
+
+    $queries = new Queries();
+    $getPeriods = array();
+
+    $stmt = "SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree,
+    UPPER(CONCAT(colab.apellido_paterno_colaborador, ' ', colab.apellido_materno_colaborador, ' ', colab.nombres_colaborador)) AS teacher_name
+        FROM school_control_ykt.assignments AS asg
+        INNER JOIN school_control_ykt.groups AS gps ON  asg.id_group = gps.id_group
+        INNER JOIN school_control_ykt.academic_levels_grade AS aclg ON gps.id_level_grade = aclg.id_level_grade
+        INNER JOIN school_control_ykt.subjects AS sbj ON sbj.id_subject = asg.id_subject
+        INNER JOIN colaboradores_ykt.colaboradores AS colab ON colab.no_colaborador = asg.no_teacher
+        $where
+        ORDER BY asg.id_assignment";
+
+    $getAssignment = $queries->getData($stmt);
+    $html = '';
+    $ass_count = 0;
+    foreach ($getAssignment as $assignment) {
+        $ass_count++;
+        $html .= "<tr>
+            <th scope='row'>$ass_count</th>
+            <th scope='row'>$assignment->id_assignment</th>
+            <td>$id_period_calendar</td>
+            <td>$assignment->name_subject</td>
+            <td>$assignment->group_code</td>
+            <td>$assignment->degree</td>
+            <td>$assignment->teacher_name</td>
+            <td>
+                <button class='btn btn-primary btnUpdateStructure' data-id-assignment='$assignment->id_assignment' data-id-period-calendar='$id_period_calendar'>
+                    <i class='fas fa-sync'></i>
+                </button>
+            </td>
+        </tr>";
+    }
+
+    $data = array(
+        'response' => true,
+        'html' => $html
+    );
+
+    echo json_encode($data);
 }

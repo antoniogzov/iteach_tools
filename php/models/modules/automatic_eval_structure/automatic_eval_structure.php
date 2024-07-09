@@ -84,6 +84,27 @@ class evalStructureAutomatic extends data_conn
                 $this->createStructureQualificationsByPeriod1($row_assignment->id_assignment, $row_assignment->id_period_calendar);
                 $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
                 WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1");
+                $this->conn->query("INSERT INTO audits.iteach (
+                    no_teacher,
+                    table_,
+                    column_,
+                    id_column,
+                    action_,
+                    id_assignment,
+                    id_period_calendar,
+                    additional_comments,
+                    date_log
+                    ) VALUES (
+                        $_SESSION[colab],
+                        'iteach_grades_quantitatives.final_grades_assignment',
+                         'N/A',
+                         'N/A',
+                         'generate_evaluation_structure',
+                         $row_assignment->id_assignment,
+                         $row_assignment->id_period_calendar,
+                         '',
+                         NOW()
+                         )");
 
                 $a++;
             }
@@ -92,13 +113,13 @@ class evalStructureAutomatic extends data_conn
         $end_time = (microtime(true) - $start_time);
         $time = $this->segundos_tiempo($end_time);
         echo 'Segundos: ' . $end_time . ' Resultado: ' . $time;
-        $time_txt= " | Tiempo de ejecución = " . $time . "";
+        $time_txt = " | Tiempo de ejecución = " . $time . "";
         echo " <h1><strong>Tiempo de ejecucion = " . $time . " </strong></h1>";
         $html1 = "<br><br> <h1><strong>Tiempo de ejecución = " . $time . " </strong></h1>";
-        $html1 .="<br>".$html;
+        $html1 .= "<br>" . $html;
 
         $this->sendMailStructure($html1, $time_txt);
-        
+
         return $results;
     }
 
@@ -443,7 +464,7 @@ class evalStructureAutomatic extends data_conn
             //$mail->addAddress('i.sistemas@ae.edu.mx');
 
             $mail->isHTML(true);                                  //Set email format to HTML
-            $mail->Subject = utf8_decode('Actualización iTeach Tools'.$time_txt);
+            $mail->Subject = utf8_decode('Actualización iTeach Tools' . $time_txt);
             $mail->Body    = $html;
 
             //Attachments
