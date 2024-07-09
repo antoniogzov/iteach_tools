@@ -459,6 +459,7 @@ class evalStructureAutomatic extends data_conn
 
             //Recipients
             $mail->addAddress('antoniogonzalez.rt@gmail.com');
+            $mail->addAddress('i.sistemas@ae.edu.mx');
             //$mail->addAddress('i.sistemas@ae.edu.mx');
             //$mail->addAddress('antoniogonzalez.rt@gmail.com');
             //$mail->addAddress('i.sistemas@ae.edu.mx');
