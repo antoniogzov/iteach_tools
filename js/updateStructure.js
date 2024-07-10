@@ -121,7 +121,6 @@ $(document).ready(function () {
         data: {
           mod: "getAssignment",
           search_value: search_value,
-          id_period_calendar: id_period_calendar,
         },
       })
         .done(function (info) {

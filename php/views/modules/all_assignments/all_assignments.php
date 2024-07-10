@@ -28,6 +28,15 @@ if (isset($_GET['id_level_combination']) && isset($_GET['id_period_calendar'])) 
 
         <div class="container">
             <div class="row">
+                <div class="col-9"></div>
+                <div class="col-3">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Buscar" aria-label="Buscar" aria-describedby="basic-addon1" id="searchAssignment">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-6">
                     <div class="form-group">
                         <label for="slct-lvl-combination">Seleccione un level combination</label>
@@ -75,21 +84,14 @@ if (isset($_GET['id_level_combination']) && isset($_GET['id_period_calendar'])) 
                 <div class="table-responsive">
                     <button class="btn btn-lg btn-primary"><i class="fas fa-sync"></i> Actualizar todas las estructuras pendientes </button>
                     <br>
-                    <div class="row">
-                        <div class="col-9"></div>
-                        <div class="col-3">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control" placeholder="Buscar" aria-label="Buscar" aria-describedby="basic-addon1" id="searchAssignment">
-                            </div>
-                        </div>
-                    </div>
+
                     <table class="table table-striped" id="tableAssignments">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">ID</th>
                                 <th scope="col">ID PERIOD</th>
+                                <th scope="col">N° de Periodo</th>
                                 <th scope="col">Materia</th>
                                 <th scope="col">Grupo</th>
                                 <th scope="col">Nivel Académico</th>
@@ -106,6 +108,7 @@ if (isset($_GET['id_level_combination']) && isset($_GET['id_period_calendar'])) 
                                         <th scope="row"><?= $ass_count ?></th>
                                         <th scope="row"><?= $assignment->id_assignment ?></th>
                                         <td><?= $assignment->id_period_calendar ?></td>
+                                        <td><?= $assignment->no_period ?></td>
                                         <td><?= $assignment->name_subject ?></td>
                                         <td><?= $assignment->group_code ?></td>
                                         <td><?= $assignment->degree ?></td>

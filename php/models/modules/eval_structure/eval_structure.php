@@ -33,7 +33,7 @@ class evalStructure extends data_conn
         INNER JOIN school_control_ykt.assignments AS asg ON asg.id_group = gps.id_group AND (show_list_teacher = 0 OR show_list_teacher = percal.no_period)
         INNER JOIN school_control_ykt.subjects AS sbj ON sbj.id_subject = asg.id_subject AND sbj.id_academic_area = lvc.id_academic_area
         INNER JOIN colaboradores_ykt.colaboradores AS colab ON colab.no_colaborador = asg.no_teacher
-        WHERE lvc.id_level_combination = $id_level_combination AND percal.id_period_calendar = $id_period_calendar
+        WHERE lvc.id_level_combination = $id_level_combination AND percal.id_period_calendar = $id_period_calendar AND asg.assignment_active = 1 AND gps.is_active = 1 AND asg.print_school_report_card = 1
         ORDER BY asg.id_assignment
         ");
 
@@ -131,7 +131,7 @@ class evalStructure extends data_conn
 
 
 
-        $get_results = $this->conn->query("SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree, percal.id_period_calendar,
+        $get_results = $this->conn->query("SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree, percal.id_period_calendar, percal.no_period,
         UPPER(CONCAT(colab.apellido_paterno_colaborador, ' ', colab.apellido_materno_colaborador, ' ', colab.nombres_colaborador)) AS teacher_name
         FROM
         iteach_grades_quantitatives.period_calendar AS percal

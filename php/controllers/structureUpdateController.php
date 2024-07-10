@@ -307,7 +307,6 @@ function getAssignment()
 {
 
     $search_value = $_POST['search_value'];
-    $id_period_calendar = $_POST['id_period_calendar'];
     $colsSearch = [
         'asg.id_assignment',
         'sbj.name_subject',
@@ -325,11 +324,37 @@ function getAssignment()
         }
         $where = substr($where, 0, -3);
         $where .= ") AND asg.assignment_active = 1 AND gps.is_active = 1 AND asg.print_school_report_card = 1 ";
+    }else{
+        $where = "WHERE asg.assignment_active = 1 AND gps.is_active = 1 AND asg.print_school_report_card = 1 ";
     }
+
+    $where = "WHERE asg.id_assignment = $search_value AND asg.assignment_active = 1 AND gps.is_active = 1 AND asg.print_school_report_card = 1 ";
+
 
 
     $queries = new Queries();
     $getPeriods = array();
+
+    $stmt = "SELECT DISTINCT lc.id_level_combination
+        FROM school_control_ykt.level_combinations AS lc
+        INNER JOIN school_control_ykt.groups AS groups ON groups.id_campus = lc.id_campus
+        INNER JOIN school_control_ykt.assignments AS assignment ON groups.id_group = assignment.id_group
+        INNER JOIN school_control_ykt.academic_levels_grade AS ac_le_gra ON groups.id_level_grade = ac_le_gra.id_level_grade
+        INNER JOIN school_control_ykt.academic_levels AS ac_le ON ac_le_gra.id_academic_level = ac_le.id_academic_level
+        INNER JOIN school_control_ykt.subjects AS subject ON assignment.id_subject = subject.id_subject
+        WHERE (lc.id_section = groups.id_section OR lc.id_section = 3) AND lc.id_campus = groups.id_campus AND lc.id_academic_level = ac_le.id_academic_level AND lc.id_academic_area = subject.id_academic_area AND assignment.id_assignment = $search_value";
+
+    $getLevelComb = $queries->getData($stmt);
+    $getPeriods = [];
+
+    if (!empty($getLevelComb)) {
+        //--- --- ---//
+        foreach ($getLevelComb as $level_combinations) {
+            $id_level_combination = $level_combinations->id_level_combination;
+            $sql_level_combinations = "SELECT * FROM iteach_grades_quantitatives.period_calendar WHERE id_level_combination = $id_level_combination";
+            $getPeriods = $queries->getData($sql_level_combinations);
+        }
+    }
 
     $stmt = "SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree,
     UPPER(CONCAT(colab.apellido_paterno_colaborador, ' ', colab.apellido_materno_colaborador, ' ', colab.nombres_colaborador)) AS teacher_name
@@ -340,27 +365,32 @@ function getAssignment()
         INNER JOIN colaboradores_ykt.colaboradores AS colab ON colab.no_colaborador = asg.no_teacher
         $where
         ORDER BY asg.id_assignment";
-
+//ECHO $stmt;
     $getAssignment = $queries->getData($stmt);
+
     $html = '';
-    $ass_count = 0;
-    foreach ($getAssignment as $assignment) {
-        $ass_count++;
-        $html .= "<tr>
-            <th scope='row'>$ass_count</th>
-            <th scope='row'>$assignment->id_assignment</th>
-            <td>$id_period_calendar</td>
-            <td>$assignment->name_subject</td>
-            <td>$assignment->group_code</td>
-            <td>$assignment->degree</td>
-            <td>$assignment->teacher_name</td>
-            <td>
-                <button class='btn btn-primary btnUpdateStructure' data-id-assignment='$assignment->id_assignment' data-id-period-calendar='$id_period_calendar'>
-                    <i class='fas fa-sync'></i>
-                </button>
-            </td>
-        </tr>";
+    foreach ($getPeriods as $period) {
+        $ass_count = 0;
+        foreach ($getAssignment as $assignment) {
+            $ass_count++;
+            $html .= "<tr>
+                <th scope='row'>$ass_count</th>
+                <th scope='row'>$assignment->id_assignment</th>
+                <td>$period->id_period_calendar</td>
+                <td>$period->no_period</td>
+                <td>$assignment->name_subject</td>
+                <td>$assignment->group_code</td>
+                <td>$assignment->degree</td>
+                <td>$assignment->teacher_name</td>
+                <td>
+                    <button class='btn btn-primary btnUpdateStructure' data-id-assignment='$assignment->id_assignment' data-id-period-calendar='$period->id_period_calendar'>
+                        <i class='fas fa-sync'></i>
+                    </button>
+                </td>
+            </tr>";
+        }
     }
+   
 
     $data = array(
         'response' => true,
