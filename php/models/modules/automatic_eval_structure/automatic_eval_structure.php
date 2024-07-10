@@ -95,7 +95,7 @@ class evalStructureAutomatic extends data_conn
                     additional_comments,
                     date_log
                     ) VALUES (
-                        $_SESSION[colab],
+                        1140,
                         'iteach_grades_quantitatives.final_grades_assignment',
                          'N/A',
                          'N/A',
