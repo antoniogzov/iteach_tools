@@ -33,6 +33,12 @@
                 $include_file = 'php/views/modules/all_assignments/all_assignments.php';
                 break;
 
+            case 'automatic_load_pendings':
+                $include_file = 'php/views/modules/automatic_load_pendings/automatic_load_pendings.php';
+                
+                break;
+
+
             default:
 
                 break;
