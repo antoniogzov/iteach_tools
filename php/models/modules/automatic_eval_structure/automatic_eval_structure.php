@@ -438,7 +438,7 @@ class evalStructureAutomatic extends data_conn
 
     public function sendMailStructure($html, $time_txt)
     {
-
+echo "hereeee";
         $mail = new PHPMailer(true);
 
         try {
@@ -476,6 +476,7 @@ class evalStructureAutomatic extends data_conn
 
             $mail->send();
         } catch (Exception $e) {
+            echo $e;
         }
     }
 
