@@ -438,7 +438,7 @@ class evalStructureAutomatic extends data_conn
 
     public function sendMailStructure($html, $time_txt)
     {
-echo "hereeee";
+
         $mail = new PHPMailer(true);
 
         try {
@@ -449,8 +449,8 @@ echo "hereeee";
             $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
             $mail->Username   = 'notificacionykt@ae.edu.mx';                     //SMTP username
             $mail->Password   = 'Ykt2020a';                               //SMTP password
-            $mail->SMTPSecure = "";            //Enable implicit TLS encryption
-            $mail->Port       = 25;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->Port       = 465;
 
             $mail->SMTPDebug = false;
 
