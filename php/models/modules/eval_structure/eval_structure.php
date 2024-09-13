@@ -172,8 +172,6 @@ class evalStructure extends data_conn
 
         $today = date('Y-m-d');
 
-
-
         $get_results = $this->conn->query("SELECT asg.id_assignment, sbj.name_subject, gps.group_code, aclg.degree, percal.no_period
         FROM
         automation_pending.iteach_pendings AS pend
@@ -282,9 +280,6 @@ class evalStructure extends data_conn
                     ")->fetchColumn();
 
 
-
-
-
                 //--- PROCESO PARA VERIFICAR SI HAY QUE MOSTRAR ALGUNA MATERIA ADICIONAL ---//
                 $add_assignment = $this->conn->query("SELECT COUNT(adt_std_assg.additional_registration_id)
                     FROM school_control_ykt.additional_registration_std_assg AS adt_std_assg
@@ -322,8 +317,92 @@ class evalStructure extends data_conn
         
                         echo "<br><br>"; */
 
+                $ev_criteria = 0;
+                $ev_criteria = $this->conn->query("SELECT gp.id_grade_period, evp.id_evaluation_plan, fg.id_final_grade, fg.id_student
+                        FROM iteach_grades_quantitatives.final_grades_assignment AS fg 
+                        INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON fg.id_assignment = evp.id_assignment 
+                        INNER JOIN iteach_grades_quantitatives.grades_period AS gp ON gp.id_final_grade = fg.id_final_grade AND gp.id_period_calendar = evp.id_period_calendar
+                        LEFT JOIN iteach_grades_quantitatives.grades_evaluation_criteria AS gec ON evp.id_evaluation_plan = gec.id_evaluation_plan AND gec.id_final_grade = fg.id_final_grade
+                        WHERE evp.id_period_calendar = $row_assignment->id_period_calendar AND fg.id_assignment = $row_assignment->id_assignment  AND gec.id_final_grade IS NOT NULL
+                        ORDER BY fg.id_final_grade, evp.id_evaluation_plan")->fetchColumn();
 
-                if ($fga_structure > 0 || $add_assignment > 0 || $fga_ass > 0 || $ev_criteria > 0) {
+                $GathCrit = 0;
+                $get_results_data = $this->conn->query("SELECT gp.id_grade_period, evp.id_evaluation_plan, fg.id_final_grade, fg.id_student
+                        FROM iteach_grades_quantitatives.final_grades_assignment AS fg 
+                        INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON fg.id_assignment = evp.id_assignment 
+                        INNER JOIN iteach_grades_quantitatives.grades_period AS gp ON gp.id_final_grade = fg.id_final_grade AND gp.id_period_calendar = evp.id_period_calendar
+                        LEFT JOIN iteach_grades_quantitatives.grades_evaluation_criteria AS gec ON evp.id_evaluation_plan = gec.id_evaluation_plan AND gec.id_final_grade = fg.id_final_grade
+                        WHERE evp.id_period_calendar = $row_assignment->id_period_calendar AND fg.id_assignment = $row_assignment->id_assignment  AND gec.id_final_grade IS NOT NULL
+                        ORDER BY fg.id_final_grade, evp.id_evaluation_plan
+                                ");
+
+
+                while ($row_assignment_data = $get_results_data->fetch(PDO::FETCH_OBJ)) {
+                    $id_grade_period = $row_assignment_data->id_grade_period;
+                    $id_evaluation_plan = $row_assignment_data->id_evaluation_plan;
+                    $id_final_grade = $row_assignment_data->id_final_grade;
+
+                    $id_student = $row_assignment_data->id_student;
+
+                    $smtCOGTH = ("
+                    ");
+                    $evConfGTH = 0;
+                    $evConfGTH = $this->conn->query("SELECT COUNT(*)
+                    FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
+                    INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON conf_gat.id_evaluation_plan = evp.id_evaluation_plan
+                    WHERE evp.id_evaluation_plan = $id_evaluation_plan AND evp.gathering = 1")->fetchColumn();
+
+                    if ($evConfGTH > 0) {
+                        $get_results_datagATH = $this->conn->query("SELECT conf_gat.*
+                            FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
+                            INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON conf_gat.id_evaluation_plan = evp.id_evaluation_plan
+                            WHERE evp.id_evaluation_plan = $id_evaluation_plan AND evp.gathering = 1
+                                ");
+
+
+                        while ($row_gath_data = $get_results_datagATH->fetch(PDO::FETCH_OBJ)) {
+
+                            $id_conf_grade_gathering = $row_gath_data->id_conf_grade_gathering;
+                            $stmtGath = " SELECT *
+                                            FROM iteach_grades_quantitatives.grades_evaluation_criteria AS gec
+                                            INNER JOIN iteach_grades_quantitatives.conf_grade_gathering AS conf_gg ON gec.id_evaluation_plan = conf_gg.id_evaluation_plan
+                                            INNER JOIN iteach_grades_quantitatives.grade_gathering AS gg ON conf_gg.id_conf_grade_gathering = gg.id_conf_grade_gathering
+                                            INNER JOIN iteach_grades_quantitatives.final_grades_assignment fga ON gg.id_final_grade = fga.id_final_grade
+                                            WHERE gg.id_conf_grade_gathering = $id_conf_grade_gathering AND fga.id_student = $id_student AND gec.id_grades_evaluation_criteria = gg.id_grades_evaluation_criteria";
+
+
+                            $evConfGTHCriter = 0;
+                            $evConfGTHCriter = $this->conn->query("SELECT count(*)
+                                            FROM iteach_grades_quantitatives.grades_evaluation_criteria AS gec
+                                            INNER JOIN iteach_grades_quantitatives.conf_grade_gathering AS conf_gg ON gec.id_evaluation_plan = conf_gg.id_evaluation_plan
+                                            INNER JOIN iteach_grades_quantitatives.grade_gathering AS gg ON conf_gg.id_conf_grade_gathering = gg.id_conf_grade_gathering
+                                            INNER JOIN iteach_grades_quantitatives.final_grades_assignment fga ON gg.id_final_grade = fga.id_final_grade
+                                            WHERE gg.id_conf_grade_gathering = $id_conf_grade_gathering AND fga.id_student = $id_student AND gec.id_grades_evaluation_criteria = gg.id_grades_evaluation_criteria")->fetchColumn();
+
+                            if ($evConfGTHCriter > 0) {
+
+
+                                //--- PROCESO PARA VERIFICAR SI HAY QUE MOSTRAR ALGUNA MATERIA ADICIONAL ---//
+
+                                $get_results_datagATHCriteria = $this->conn->query("SELECT conf_gg.id_conf_grade_gathering, conf_gg.id_evaluation_plan, gec.id_final_grade, gec.id_grades_evaluation_criteria
+                                                FROM iteach_grades_quantitatives.grades_evaluation_criteria AS gec
+                                                INNER JOIN iteach_grades_quantitatives.conf_grade_gathering AS conf_gg ON gec.id_evaluation_plan = conf_gg.id_evaluation_plan
+                                                INNER JOIN iteach_grades_quantitatives.final_grades_assignment fga ON gec.id_final_grade = fga.id_final_grade
+                                                WHERE conf_gg.id_conf_grade_gathering = $id_conf_grade_gathering AND fga.id_student = $id_student
+                                    ");
+
+
+                                while ($row_gathCriteria_data = $get_results_datagATHCriteria->fetch(PDO::FETCH_OBJ)) {
+                                    $GathCrit++;
+                                }
+                            }
+                        }
+                    } else {
+                        $GathCrit++;
+                    }
+                }
+
+                if ($fga_structure > 0 || $add_assignment > 0 || $fga_ass > 0 || $ev_criteria > 0 || $GathCrit > 0) {
 
                     $results[] = $row_assignment;
 

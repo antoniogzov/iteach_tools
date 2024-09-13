@@ -82,8 +82,8 @@ class evalStructureAutomatic extends data_conn
                     $html .= "<br><h1>ASIGNATURA: $row_assignment_data->name_subject | $row_assignment_data->group_code | $row_assignment->id_assignment</h1>";
                 }
                 $this->createStructureQualificationsByPeriod1($row_assignment->id_assignment, $row_assignment->id_period_calendar);
-                $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
-                WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1");
+              /*   $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
+                WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1"); */
                 $this->conn->query("INSERT INTO audits.iteach (
                     no_teacher,
                     table_,
@@ -337,47 +337,88 @@ class evalStructureAutomatic extends data_conn
                 $id_student = $row->id_student;
 
                 $smtCOGTH = ("SELECT conf_gat.*
-        FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
-        INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON conf_gat.id_evaluation_plan = evp.id_evaluation_plan
-        WHERE evp.id_evaluation_plan = $id_evaluation_plan AND evp.gathering = 1
-        ");
+                    FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
+                    INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON conf_gat.id_evaluation_plan = evp.id_evaluation_plan
+                    WHERE evp.id_evaluation_plan = $id_evaluation_plan AND evp.gathering = 1
+                    ");
                 $getConfGathering = $this->conn->query($smtCOGTH);
 
-                while ($confggath = $getConfGathering->fetch(PDO::FETCH_OBJ)) {
 
-                    $id_conf_grade_gathering = $confggath->id_conf_grade_gathering;
-
-                    $count_GATH = $this->conn->query("SELECT COUNT(*)
+                $evConfGTH = 0;
+                $evConfGTH = $this->conn->query("SELECT COUNT(*)
+                FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
+                INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON conf_gat.id_evaluation_plan = evp.id_evaluation_plan
+                WHERE evp.id_evaluation_plan = $id_evaluation_plan AND evp.gathering = 1")->fetchColumn();
+        
+                if ($evConfGTH > 0) {
+        
+                    while ($confggath = $getConfGathering->fetch(PDO::FETCH_OBJ)) {
+        
+                        $id_conf_grade_gathering = $confggath->id_conf_grade_gathering;
+        
+                        $count_GATH = $this->conn->query("SELECT COUNT(*)
                     FROM iteach_grades_quantitatives.grades_evaluation_criteria AS gec
                                 INNER JOIN iteach_grades_quantitatives.conf_grade_gathering AS conf_gg ON gec.id_evaluation_plan = conf_gg.id_evaluation_plan
                                 INNER JOIN iteach_grades_quantitatives.grade_gathering AS gg ON conf_gg.id_conf_grade_gathering = gg.id_conf_grade_gathering
                                 INNER JOIN iteach_grades_quantitatives.final_grades_assignment fga ON gg.id_final_grade = fga.id_final_grade
                                 WHERE gg.id_conf_grade_gathering = $id_conf_grade_gathering AND fga.id_student = $id_student AND gec.id_grades_evaluation_criteria = gg.id_grades_evaluation_criteria")->fetchColumn();
-
-                    if ($count_GATH == 0) {
-
-                        //--- PROCESO PARA VERIFICAR SI HAY QUE MOSTRAR ALGUNA MATERIA ADICIONAL ---//
-                        $queryGRGTH = "SELECT conf_gg.id_conf_grade_gathering, conf_gg.id_evaluation_plan, gec.id_final_grade, gec.id_grades_evaluation_criteria
-                FROM iteach_grades_quantitatives.grades_evaluation_criteria AS gec
-                INNER JOIN iteach_grades_quantitatives.conf_grade_gathering AS conf_gg ON gec.id_evaluation_plan = conf_gg.id_evaluation_plan
-                INNER JOIN iteach_grades_quantitatives.final_grades_assignment fga ON gec.id_final_grade = fga.id_final_grade
-                WHERE conf_gg.id_conf_grade_gathering = $id_conf_grade_gathering AND fga.id_student = $id_student";
-
-                        $getGraGthStructure = $this->conn->query($queryGRGTH);
-
-                        while ($grath = $getGraGthStructure->fetch(PDO::FETCH_OBJ)) {
-
-
-                            $id_conf_grade_gathering = $grath->id_conf_grade_gathering;
-                            $id_evaluation_plan      = $grath->id_evaluation_plan;
-                            $id_final_grade          = $grath->id_final_grade;
-                            $id_grades_evaluation_criteria = $grath->id_grades_evaluation_criteria;
-
-                            $stmtGraGth = ("INSERT INTO iteach_grades_quantitatives.grade_gathering (id_conf_grade_gathering, id_evaluation_plan, id_grades_evaluation_criteria, id_final_grade) VALUES ('$id_conf_grade_gathering', '$id_evaluation_plan', '$id_grades_evaluation_criteria', '$id_final_grade')");
-                            $this->conn->query($stmtGraGth);
+        
+                        if ($count_GATH == 0) {
+        
+                            //--- PROCESO PARA VERIFICAR SI HAY QUE MOSTRAR ALGUNA MATERIA ADICIONAL ---//
+                            $queryGRGTH = "SELECT conf_gg.id_conf_grade_gathering, conf_gg.id_evaluation_plan, gec.id_final_grade, gec.id_grades_evaluation_criteria
+                        FROM iteach_grades_quantitatives.grades_evaluation_criteria AS gec
+                        INNER JOIN iteach_grades_quantitatives.conf_grade_gathering AS conf_gg ON gec.id_evaluation_plan = conf_gg.id_evaluation_plan
+                        INNER JOIN iteach_grades_quantitatives.final_grades_assignment fga ON gec.id_final_grade = fga.id_final_grade
+                        WHERE conf_gg.id_conf_grade_gathering = $id_conf_grade_gathering AND fga.id_student = $id_student";
+        
+                            $getGraGthStructure = $this->conn->query($queryGRGTH);
+        
+                            while ($grath = $getGraGthStructure->fetch(PDO::FETCH_OBJ)) {
+        
+        
+                                $id_conf_grade_gathering = $grath->id_conf_grade_gathering;
+                                $id_evaluation_plan      = $grath->id_evaluation_plan;
+                                $id_final_grade          = $grath->id_final_grade;
+                                $id_grades_evaluation_criteria = $grath->id_grades_evaluation_criteria;
+        
+                                $stmtGraGth = ("INSERT INTO iteach_grades_quantitatives.grade_gathering (id_conf_grade_gathering, id_evaluation_plan, id_grades_evaluation_criteria, id_final_grade) VALUES ('$id_conf_grade_gathering', '$id_evaluation_plan', '$id_grades_evaluation_criteria', '$id_final_grade')");
+                                $this->conn->query($stmtGraGth);
+                            }
+                        }
+                    }
+                } else {
+                    
+                    $num_gathering = 20;
+        
+                    $smtCOGTHDataInfo = ("SELECT es.*
+                FROM iteach_grades_quantitatives.evaluation_plan AS ep
+                INNER JOIN  iteach_grades_quantitatives.evaluation_source AS es ON ep.id_evaluation_source = es.id_evaluation_source
+                WHERE ep.id_evaluation_plan = $id_evaluation_plan AND ep.gathering = 1
+                ");
+        
+                $getConfGatheringInfo = $this->conn->query($smtCOGTHDataInfo);
+                    $evConfGTHCount = $this->conn->query("SELECT COUNT(*)
+                FROM iteach_grades_quantitatives.conf_grade_gathering AS conf_gat
+                INNER JOIN iteach_grades_quantitatives.evaluation_plan AS evp ON conf_gat.id_evaluation_plan = evp.id_evaluation_plan
+                WHERE evp.id_evaluation_plan = $id_evaluation_plan AND evp.gathering = 1")->fetchColumn();
+        
+                    if (($evConfGTHCount) == 0) {
+                        while ($confggathInfo = $getConfGatheringInfo->fetch(PDO::FETCH_OBJ)) {
+                            for ($i = 1; $i <= $num_gathering; $i++) {
+        
+                                $name_item = $confggathInfo->evaluation_name . " " . $i;
+                                $sqlInsertGathering = "";
+                                $stmtGraGthDet = ("INSERT INTO iteach_grades_quantitatives.conf_grade_gathering (id_evaluation_plan, name_item) VALUES(
+                            $id_evaluation_plan,
+                            '$name_item'
+                            ) ");
+                                $this->conn->query($stmtGraGthDet);
+                            }
                         }
                     }
                 }
+        
             }
 
             $stmtGraGth = ("INSERT INTO audits.iteach (
@@ -408,6 +449,7 @@ class evalStructureAutomatic extends data_conn
             );
         }
 
+        
         //  echo json_encode($data);
     }
 
