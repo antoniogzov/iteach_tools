@@ -82,8 +82,8 @@ class evalStructureAutomatic extends data_conn
                     $html .= "<br><h1>ASIGNATURA: $row_assignment_data->name_subject | $row_assignment_data->group_code | $row_assignment->id_assignment</h1>";
                 }
                 $this->createStructureQualificationsByPeriod1($row_assignment->id_assignment, $row_assignment->id_period_calendar);
-              /*   $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
-                WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1"); */
+                $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
+                WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1");
                 $this->conn->query("INSERT INTO audits.iteach (
                     no_teacher,
                     table_,
