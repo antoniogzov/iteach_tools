@@ -108,6 +108,9 @@ class evalStructureAutomatic extends data_conn
 
                 $a++;
             }
+
+            $this->conn->query("UPDATE automation_pending.iteach_pendings SET active = 0
+                WHERE id_assignment = $row_assignment->id_assignment AND id_period_calendar = $row_assignment->id_period_calendar AND active = 1");
         }
         // Calcular tiempo demorado  
         $end_time = (microtime(true) - $start_time);
@@ -389,7 +392,7 @@ class evalStructureAutomatic extends data_conn
                     }
                 } else {
                     
-                    $num_gathering = 20;
+                  /*   $num_gathering = 20;
         
                     $smtCOGTHDataInfo = ("SELECT es.*
                 FROM iteach_grades_quantitatives.evaluation_plan AS ep
@@ -416,7 +419,7 @@ class evalStructureAutomatic extends data_conn
                                 $this->conn->query($stmtGraGthDet);
                             }
                         }
-                    }
+                    } */
                 }
         
             }
